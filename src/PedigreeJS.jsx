@@ -2,7 +2,7 @@
 /* © 2024 University of Cambridge. All rights reserved.  
 **/
 import React from 'react';
-import { pedigreejs, pedigreejs_zooming, pedigreejs_pedcache, pedigreejs_io } from "./pedigreejs.es.v3.0.0-rc8";
+import { pedigreejs, pedigreejs_zooming, pedigreejs_pedcache, pedigreejs_io } from "./pedigreejs.es.v4.0.0-rc1";
 
 
 export class PedigreeJS extends React.Component {
