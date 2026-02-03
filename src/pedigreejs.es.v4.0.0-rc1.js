@@ -1220,27 +1220,32 @@ function addButtons(options) {
 		btn_target: 'pedigree_history'
     }, options );
 
-	let btns = [{"fa": "fa-file-image", "title": "download PNG image"},
-				{"fa": "fa-undo", "title": "undo"},
-				{"fa": "fa-redo", "title": "redo"},
-				{"fa": "fa-refresh", "title": "reset"}];
+	let btns1 = [{"fa": "fa-file-image", "title": "download PNG image"},
+				 {"fa": "fa-undo", "title": "undo"},
+				 {"fa": "fa-redo", "title": "redo"},
+				 {"fa": "fa-refresh", "title": "reset"}];
+	let btns2 = [{"fa": "fa-crosshairs", "title": "scale-to-fit"}];
 
-	btns.push({"fa": "fa-crosshairs", "title": "scale-to-fit"});
 	if(opts.zoomSrc && (opts.zoomSrc.indexOf('button') > -1)) {
 		if(opts.zoomOut !== 1)
-			btns.push({"fa": "fa-minus-circle", "title": "zoom-out"});
+			btns2.push({"fa": "fa-minus-circle", "title": "zoom-out"});
 		if(opts.zoomIn !== 1)
-			btns.push({"fa": "fa-plus-circle", "title": "zoom-in"});
+			btns2.push({"fa": "fa-plus-circle", "title": "zoom-in"});
 	}
-	btns.push({"fa": "fa-arrows-alt", "title": "fullscreen"});
+	btns2.push({"fa": "fa-arrows-alt", "title": "fullscreen"});
 
+	let btns = [btns1, btns2];
 	let lis = "";
 	for(let i=0; i<btns.length; i++) {
-		lis += '<span>';
-		lis += '<i class="fa fa-lg ' + btns[i].fa + ' pe-2" aria-hidden="true" title="'+ btns[i].title + '"' +
-		(btns[i].fa === "fa-arrows-alt" ? 'id="fullscreen" ' : '') +
-		'></i>';
-
+		let b = btns[i];
+		lis += '<span class="btnm">';
+		for(let j=0; j<b.length; j++) {
+			lis += '<span>';
+			lis += '<i class="fa fa-lg ' + b[j].fa + ' me-1" aria-hidden="true" title="'+ b[j].title + '"' +
+			(b[j].fa === "fa-arrows-alt" ? 'id="fullscreen" ' : '') +
+			'></i>';
+			lis += '</span>';
+		}
 		lis += '</span>';
 	}
 	$( "#"+opts.btn_target ).append(lis);
@@ -1316,7 +1321,7 @@ function addPbuttonEvents(opts) {
 			scale_to_fit(opts);
 		} else if ($(e.target).hasClass('fa-file-image')) {
 			return;
-		} 
+		}
 
 		// trigger fhChange event
 		$(document).trigger('fhChange', [opts]);
@@ -2072,7 +2077,7 @@ function print(el, id){
 	let height = $(window).height()-10;
 	let cssFiles = [
 		'/static/css/canrisk.css',
-		'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css'
+		'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css'
 	];
 	let printWindow = window.open('', 'PrintMap', 'width=' + width + ',height=' + height);
 	let headContent = '';
@@ -2829,7 +2834,7 @@ function save(opts) {
 
 	// record HOXB13 genetic test
 	let hoxb13_result = $('#person_details select[name="hoxb13_gene_test_result"]').val();
-	if(hoxb13_result !== undefined && hoxb13_result !== '-') {
+	if(hoxb13_result !== undefined && hoxb13_result !== '-' && hoxb13_result !== '0') {
 		person["hoxb13_gene_test"] = {'type': 'T', 'result': hoxb13_result};	// assume direct test
 	} else {
 		delete person["hoxb13_gene_test"];
@@ -3046,10 +3051,10 @@ function addWidgets(opts, node) {
 		.attr("class", 'indi_rect')
 		.attr("rx", 6)
 		.attr("ry", 6)
-		.attr("x", function(_d) { return -0.75*opts.symbol_size; })
-		.attr("y", function(_d) { return - opts.symbol_size; })
-		.attr("width",  (1.5 * opts.symbol_size)+'px')
-		.attr("height", (2 * opts.symbol_size)+'px')
+		.attr("x", function(_d) { return -0.8*opts.symbol_size; })
+		.attr("y", function(_d) { return -1.1*opts.symbol_size; })
+		.attr("width",  (1.6 * opts.symbol_size)+'px')
+		.attr("height", (2.2 * opts.symbol_size)+'px')
 		.attr("stroke", "black")
 		.attr("stroke-width", 0.7)
 		.attr("opacity", 0)
@@ -3057,36 +3062,62 @@ function addWidgets(opts, node) {
 
 	// widgets
 	let fx = function(_d) {return off - (0.75*opts.symbol_size);};
-	let fy = opts.symbol_size -2;
+	let fy = opts.symbol_size;
 	let off = 0;
 	let widgets = {
 		'addchild':   {'text': '\uf063', 'title': 'add child',   'fx': fx, 'fy': fy},
-		'addsibling': {'text': '\uf234', 'title': 'add sibling', 'fx': fx, 'fy': fy},
-		'addpartner': {'text': '\uf0c1', 'title': 'add partner', 'fx': fx, 'fy': fy},
+		'addsibling': {'text': '\uf234', 'title': 'add sibling', 'fx': (-font_size/2), 'fy': fy},
+		'addpartner': {'text': '\uf0c1', 'title': 'add partner', 'fx': (opts.symbol_size/2) - 5, 'fy': fy},
 		'addparents': {
 			'text': '\uf062', 'title': 'add parents',
 			'fx': -0.75*opts.symbol_size,
-			'fy': - opts.symbol_size + 11
+			'fy': - opts.symbol_size + 10
 		},
 		'delete': {
-			'text': 'X', 'title': 'delete',
-			'fx': (opts.symbol_size/2) - 1,
-			'fy': - opts.symbol_size + 12,
-			'styles': {"font-weight": "bold", "fill": "darkred", "font-family": "monospace"}
+			'text': '\uf00d', 'title': 'delete',
+			'fx': (opts.symbol_size/2) - 3,
+			'fy': - opts.symbol_size + 10,
+			'styles': {"fill": "darkred"}
 		}
 	};
 
 	if(opts.edit) {
-		widgets.settings = {'text': '\uf013', 'title': 'settings', 'fx': (-font_size/2)+2, 'fy': -opts.symbol_size + 11};
+		widgets.settings = {'text': '\uf013', 'title': 'settings', 'fx': (-font_size/2)+1, 'fy': -opts.symbol_size + 9, 'fontSize': '0.8em'};
 	}
 
 	for(let key in widgets) {
 		let widget = node.filter(function (d) {
-				return  (d.data.hidden && !opts.DEBUG ? false : true) &&
-						!((d.data.mother === undefined || d.data.noparents) && key === 'addsibling') &&
-						!(d.data.parent_node !== undefined && d.data.parent_node.length > 1 && key === 'addpartner') &&
-						!(d.data.parent_node === undefined && key === 'addchild') &&
-						!((d.data.noparents === undefined && d.data.top_level === undefined) && key === 'addparents');
+				let mother = opts.dataset.find(item => item.name === (typeof d.data.mother === 'string' || d.data.mother === undefined? d.data.mother: d.data.mother.name));
+				if (d.data.hidden && !opts.DEBUG)
+					return false;
+				if (key === 'addchild'){
+					// Do not create child for single parent
+					if (d.data.parent_node === undefined)
+						return false;
+					// Do not create child from a parent having several partners because of the ambiguity
+					else if (d.data.parent_node.length > 1)
+						return false;
+				}
+				else if (key === 'addpartner'){
+					// Do not create partner if already has several partners
+					if (d.data.parent_node !== undefined && d.data.parent_node.length > 1)
+						return false;
+					// Do not create partners for unknown sex people
+					else if (d.data.sex === 'U')
+						return false;
+				}
+				else if (key === 'addparents'){
+					// Do not create parents for people already having parents or being top_level
+					if (d.data.noparents === undefined && d.data.top_level === undefined)
+						return false;
+				}
+				else if (key === 'addsibling')
+				{
+					// Do not create sibling for child without declared mother nor parents
+					if (mother === undefined || d.data.noparents)
+						return false;
+				}
+				return true;
 			})
 			.append("text")
 			.attr("class", key)
@@ -3096,7 +3127,7 @@ function addWidgets(opts, node) {
 			.attr("yy", function(d){return d.y;})
 			.attr("x", widgets[key].fx)
 			.attr("y", widgets[key].fy)
-			.attr('font-size', '0.85em' )
+			.attr('font-size', widgets[key].fontSize ? widgets[key].fontSize : '0.85em')
 			.text(widgets[key].text);
 
 		if('styles' in widgets[key])
@@ -3182,7 +3213,7 @@ function addWidgets(opts, node) {
 		last_mouseover = d;
 		if(dragging) {
 			if(dragging.data.name !== last_mouseover.data.name &&
-			   dragging.data.sex !== last_mouseover.data.sex) {
+			   dragging.data.sex !== last_mouseover.data.sex && last_mouseover.data.sex !== "U" && dragging.data.sex !== "U") {
 				d3.select(this).select('rect').attr("opacity", 0.2);
 			}
 			return;
@@ -3245,7 +3276,9 @@ function drag_handle(opts) {
 	}
 
 	function dragstop(_d) {
-		if(last_mouseover &&
+		if ((dragging && dragging.data && dragging.data.sex === 'U') || (last_mouseover && last_mouseover.data && last_mouseover.data.sex === "U"))
+			messages("Warning", "Unable to create partner from/to someone with unknown sex");
+		else if(last_mouseover &&
 		   dragging.data.name !== last_mouseover.data.name &&
 		   dragging.data.sex  !== last_mouseover.data.sex) {
 			// make partners
@@ -3315,10 +3348,14 @@ function openEditDialog(opts, d) {
 	table += "<tr><td style='text-align:right'>Year Of Birth</td><td><input class='form-control' type='number' id='id_yob' min='1900' max='2050' name='yob' style='width:7em' value="+
 		(d.data.yob ? d.data.yob : "")+"></td></tr>";
 
+	// check if person has a partner
+	const hasPartner = d.data.parent_node && d.data.sex !== 'U';
+	const disableInp = (hasPartner ? "disabled" : "");
+	const label = '<label class="radio-inline"><input type="radio" name="sex" ';
 	table += '<tr><td colspan="2" id="id_sex">' +
-			 '<label class="radio-inline"><input type="radio" name="sex" value="M" '+(d.data.sex === 'M' ? "checked" : "")+'>Male</label>' +
-			 '<label class="radio-inline"><input type="radio" name="sex" value="F" '+(d.data.sex === 'F' ? "checked" : "")+'>Female</label>' +
-			 '<label class="radio-inline"><input type="radio" name="sex" value="U">Unknown</label>' +
+			 label+'value="M" '+(d.data.sex === 'M' ? "checked " : " ")+disableInp+'>Male</label>' +
+			 label+'value="F" '+(d.data.sex === 'F' ? "checked " : " ")+disableInp+'>Female</label>' +
+			 label+'value="U" '+(d.data.sex === 'U' ? "checked " : " ")+disableInp+'>Unknown</label>' +
 			 '</td></tr>';
 
 	// alive status = 0; dead status = 1
@@ -3563,7 +3600,7 @@ function addpartner(opts, dataset, name) {
 	let flat_tree = flatten(root);
 	let tree_node = getNodeByName(flat_tree, name);
 
-	let partner = addsibling(dataset, tree_node.data, tree_node.data.sex === 'F' ? 'M' : 'F', tree_node.data.sex === 'F');
+	let partner = addsibling(dataset, tree_node.data, tree_node.data.sex === 'F' ? 'M' : 'F', tree_node.data.sex === 'F' ^ (tree_node.data.parent_node && tree_node.data.parent_node.length >0) );
 	partner.noparents = true;
 
 	let child = {"name": makeid(4), "sex": "M"};
